@@ -44,7 +44,7 @@ local function show_suggestion()
         extmark.virt_lines[i - 1] = { { lines[i], "Comment" } }
       end
     else
-      extmark.virt_text_pos = "inline"
+      extmark.virt_text_win_col = col
     end
 
     M.suggestion = lines
@@ -59,6 +59,11 @@ end
 
 function M.schedule()
   M.cancel()
+
+  if not refact_lsp.should_do_suggestion() then
+    return
+  end
+
   M.timer = fn.timer_start(config.debounce_ms, function()
     if fn.mode() == "i" then
       show_suggestion()
@@ -70,14 +75,20 @@ local function complete()
   if M.suggestion == nil then
     return
   end
+
   if refact_lsp.should_do_multiline() or #M.suggestion > 1 then
-    local line, col = util.get_cursor_pos()
+    local line, _ = util.get_cursor_pos()
     api.nvim_buf_set_lines(0, line - 1, line, false, M.suggestion)
+
     local new_line = line + #M.suggestion - 1
     local new_col = string.len(M.suggestion[#M.suggestion]) + 1
     api.nvim_win_set_cursor(0, { new_line, new_col })
   else
-    api.nvim_put(M.suggestion, "c", false, true)
+    local line, col = util.get_cursor_pos()
+    local current_line = util.get_current_line()
+    current_line = current_line:sub(1, col)
+    api.nvim_buf_set_lines(0, line - 1, line, false, { current_line .. M.suggestion[1] })
+    api.nvim_win_set_cursor(0, { line, col + string.len(M.suggestion[1]) })
   end
   M.suggestion = nil
 end

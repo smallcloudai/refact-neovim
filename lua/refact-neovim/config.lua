@@ -2,6 +2,7 @@ local default_config = {
   max_tokens = 50,
   accept_keymap = "<Tab>",
   debounce_ms = 200,
+  completion_expression = "^[%s%]:(){},.\"';>]*$"
 }
 
 local M = {

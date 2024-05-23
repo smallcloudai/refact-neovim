@@ -15,9 +15,13 @@ function M.extract_generation(response)
   return response[1].code_completion
 end
 
+function M.should_do_suggestion()
+  local remaining_text = util.get_till_end_of_current_line()
+  return remaining_text:match(config.completion_expression) ~= nil
+end
+
 function M.should_do_multiline()
-  local line, _ = util.get_cursor_pos()
-  return api.nvim_buf_get_lines(0, line - 1, line, true)[1]:match("^%s*$") ~= nil
+  return util.is_only_white_space(util.get_current_line())
 end
 
 function M.get_completions(callback)
