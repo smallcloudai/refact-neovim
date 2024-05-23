@@ -1,4 +1,5 @@
 local util = require("refact-neovim.util")
+local config = require("refact-neovim.config").get()
 local lsp = vim.lsp
 local api = vim.api
 
@@ -32,7 +33,7 @@ function M.get_completions(callback)
   local params = lsp.util.make_position_params()
   params.parameters = {
     temperature = 0.1,
-    max_new_tokens = 50,
+    max_new_tokens = config.max_tokens,
   }
   params.multiline = M.should_do_multiline()
 

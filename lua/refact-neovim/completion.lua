@@ -1,5 +1,6 @@
 local refact_lsp = require("refact-neovim.lsp")
 local util = require("refact-neovim.util")
+local config = require("refact-neovim.config").get()
 local api = vim.api
 local fn = vim.fn
 
@@ -58,7 +59,7 @@ end
 
 function M.schedule()
   M.cancel()
-  M.timer = fn.timer_start(500, function()
+  M.timer = fn.timer_start(config.debounce_ms, function()
     if fn.mode() == "i" then
       show_suggestion()
     end
