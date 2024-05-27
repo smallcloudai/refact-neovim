@@ -1,12 +1,70 @@
 local util = require("refact-neovim.util")
-local config = require("refact-neovim.config").get()
+local config = require("refact-neovim.config")
 local lsp = vim.lsp
 local api = vim.api
+local fn = vim.fn
 
 local M = {
   setup_done = false,
   client_id = nil
 }
+
+local function get_bin_url()
+  local os_uname = vim.uv.os_uname()
+  local arch = os_uname.machine
+  local os = os_uname.sysname
+
+  -- todo: put urls to download binary, instead of source code
+  local dist_map = {
+    x86_64_Linux = "https://github.com/smallcloudai/refact-lsp/archive/refs/tags/v0.8.0.zip",
+    armv7l_Linux = "https://github.com/smallcloudai/refact-lsp/archive/refs/tags/v0.8.0.zip",
+    arm64_Linux = "https://github.com/smallcloudai/refact-lsp/archive/refs/tags/v0.8.0.zip",
+    x86_64_Windows = "https://github.com/smallcloudai/refact-lsp/archive/refs/tags/v0.8.0.zip",
+    i686_Windows = "https://github.com/smallcloudai/refact-lsp/archive/refs/tags/v0.8.0.zip",
+    arm64_Windows = "https://github.com/smallcloudai/refact-lsp/archive/refs/tags/v0.8.0.zip",
+    x86_64_Darwin = "https://github.com/smallcloudai/refact-lsp/archive/refs/tags/v0.8.0.zip",
+    arm64_Darwin = "https://github.com/smallcloudai/refact-lsp/archive/refs/tags/v0.8.0.zip",
+  }
+
+  return dist_map[arch .. "_" .. os]
+end
+
+local function download_and_unzip(url, path)
+  fn.system("curl -L -o " .. path .. ".zip " .. url)
+  fn.system("unzip " .. path .. ".zip -d " .. path .. "-src")
+  fn.system("rm " .. path .. ".zip")
+  fn.system("cargo build --release --manifest-path=" .. path .. "-src/refact-lsp-0.8.0/Cargo.toml")
+  fn.system("mv " .. path .. "-src/refact-lsp-0.8.0/target/release/refact-lsp " .. path)
+  fn.system("rm -r " .. path .. "-src")
+end
+
+local function download_lsp()
+  local url = get_bin_url()
+  if url == nil then
+    return
+  end
+
+  local lsp_bin = config.get().lsp_bin
+  if lsp_bin ~= nil then
+    if fn.filereadable(lsp_bin) == 0 then
+      vim.notify("[REFACT] couldn't find lsp binary: " .. lsp_bin, vim.log.levels.ERROR)
+      return nil
+    end
+
+    return lsp_bin
+  end
+
+  local bin_dir = api.nvim_call_function("stdpath", { "data" }) .. "/refact-neovim/bin"
+  fn.system("mkdir -p " .. bin_dir)
+  local bin_path = bin_dir .. "/refact-lsp"
+
+  if fn.filereadable(bin_path) == 0 then
+    download_and_unzip(url, bin_path)
+    vim.notify("[REFACT] successfully downloaded refact-lsp", vim.log.levels.INFO)
+  end
+
+  return bin_path
+end
 
 function M.extract_generation(response)
   if #response == 0 then
@@ -17,7 +75,7 @@ end
 
 function M.should_do_suggestion()
   local remaining_text = util.get_till_end_of_current_line()
-  return remaining_text:match(config.completion_expression) ~= nil
+  return remaining_text:match(config.get().completion_expression) ~= nil
 end
 
 function M.should_do_multiline()
@@ -37,7 +95,7 @@ function M.get_completions(callback)
   local params = lsp.util.make_position_params()
   params.parameters = {
     temperature = 0.1,
-    max_new_tokens = config.max_tokens,
+    max_new_tokens = config.get().max_tokens,
   }
   params.multiline = M.should_do_multiline()
 
@@ -64,7 +122,19 @@ function M.setup()
     return
   end
 
-  local cmd = lsp.rpc.connect("127.0.0.1", 8002)
+  local path = download_lsp()
+
+  if path == nil then
+    vim.notify("[REFACT] failed to download refact-lsp", vim.log.levels.ERROR)
+    return
+  end
+
+  local cmd = {
+    path,
+    "--address-url", config.get().address_url,
+    "--api-key", config.get().api_key,
+    "--lsp-stdin-stdout", "1"
+  }
 
   local client_id = lsp.start({
     name = "refact",

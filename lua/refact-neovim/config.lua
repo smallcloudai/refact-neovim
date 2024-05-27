@@ -2,11 +2,15 @@ local default_config = {
   max_tokens = 50,
   accept_keymap = "<Tab>",
   debounce_ms = 200,
-  completion_expression = "^[%s%]:(){},.\"';>]*$"
+  completion_expression = "^[%s%]:(){},.\"';>]*$",
+  --- @type string | nil
+  lsp_bin = nil,
+  address_url = "Refact",
+  api_key = "",
 }
 
 local M = {
-  config = vim.deepcopy(default_config),
+  config = nil,
 }
 
 function M.setup(user_config)
@@ -14,6 +18,11 @@ function M.setup(user_config)
 end
 
 function M.get()
+  if M.config == nil then
+    vim.notify("[REFACT] config is not initialized", vim.log.levels.ERROR)
+    return nil
+  end
+
   return M.config
 end
 
