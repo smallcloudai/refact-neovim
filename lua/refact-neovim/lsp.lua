@@ -122,6 +122,11 @@ function M.setup()
     return
   end
 
+  if config.get().api_key == "" then
+    vim.notify("[REFACT] api_key is not set", vim.log.levels.ERROR)
+    return
+  end
+
   local path = download_lsp()
 
   if path == nil then
