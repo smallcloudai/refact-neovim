@@ -1,6 +1,7 @@
 local refact_lsp = require("refact-neovim.lsp")
 local config = require("refact-neovim.config")
 local completion = require("refact-neovim.completion")
+local status_line = require("refact-neovim.status_line")
 local api = vim.api
 
 local function setup(user_config)
@@ -27,5 +28,6 @@ local function setup(user_config)
 end
 
 return {
-  setup = setup
+  setup = setup,
+  status_line = status_line,
 }

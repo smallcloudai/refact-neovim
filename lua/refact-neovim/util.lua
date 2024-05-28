@@ -36,4 +36,27 @@ function M.is_only_white_space(str)
   return str:match("^%s*$") ~= nil
 end
 
+function M.is_module_available(name)
+  if package.loaded[name] then
+    return true
+  else
+    for _, searcher in ipairs(package.loaders) do
+      local loader = searcher(name)
+      if type(loader) == 'function' then
+        package.preload[name] = loader
+        return true
+      end
+    end
+    return false
+  end
+end
+
+function M.try_require(name)
+  if not M.is_module_available(name) then
+    return nil
+  else
+    return require(name)
+  end
+end
+
 return M

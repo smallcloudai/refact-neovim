@@ -1,6 +1,7 @@
 local refact_lsp = require("refact-neovim.lsp")
 local util = require("refact-neovim.util")
 local config = require("refact-neovim.config")
+local lualine = util.try_require("lualine")
 local api = vim.api
 local fn = vim.fn
 
@@ -10,7 +11,6 @@ local M = {
   processing = false,
   ns_id = api.nvim_create_namespace("refact.suggestion"),
 }
-
 
 local function stop_timer()
   if M.timer then
@@ -23,15 +23,23 @@ local function clear_preview()
   api.nvim_buf_clear_namespace(0, M.ns_id, 0, -1)
 end
 
+local function refresh_lualine()
+  if lualine ~= nil then
+    lualine.refresh()
+  end
+end
+
 local function show_suggestion()
   clear_preview()
   M.processing = true
+  refresh_lualine()
   refact_lsp.get_completions(function(err, result)
     if not M.processing then
       return
     end
 
     M.processing = false
+    refresh_lualine()
     if err ~= nil then
       vim.notify("[REFACT] " .. err.message, vim.log.levels.ERROR)
       return
@@ -62,6 +70,7 @@ end
 
 function M.cancel()
   M.processing = false
+  refresh_lualine()
   clear_preview()
   stop_timer()
 end
