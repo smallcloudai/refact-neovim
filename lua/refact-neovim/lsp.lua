@@ -16,14 +16,14 @@ local function get_bin_url()
 
   -- todo: put urls to download binary, instead of source code
   local dist_map = {
-    x86_64_Linux = "https://github.com/smallcloudai/refact-lsp/archive/refs/tags/v0.8.0.zip",
-    armv7l_Linux = "https://github.com/smallcloudai/refact-lsp/archive/refs/tags/v0.8.0.zip",
-    arm64_Linux = "https://github.com/smallcloudai/refact-lsp/archive/refs/tags/v0.8.0.zip",
-    x86_64_Windows = "https://github.com/smallcloudai/refact-lsp/archive/refs/tags/v0.8.0.zip",
-    i686_Windows = "https://github.com/smallcloudai/refact-lsp/archive/refs/tags/v0.8.0.zip",
-    arm64_Windows = "https://github.com/smallcloudai/refact-lsp/archive/refs/tags/v0.8.0.zip",
-    x86_64_Darwin = "https://github.com/smallcloudai/refact-lsp/archive/refs/tags/v0.8.0.zip",
-    arm64_Darwin = "https://github.com/smallcloudai/refact-lsp/archive/refs/tags/v0.8.0.zip",
+    x86_64_Linux = "https://github.com/smallcloudai/refact-lsp/archive/refs/tags/v0.8.2.zip",
+    armv7l_Linux = "https://github.com/smallcloudai/refact-lsp/archive/refs/tags/v0.8.2.zip",
+    arm64_Linux = "https://github.com/smallcloudai/refact-lsp/archive/refs/tags/v0.8.2.zip",
+    x86_64_Windows = "https://github.com/smallcloudai/refact-lsp/archive/refs/tags/v0.8.2.zip",
+    i686_Windows = "https://github.com/smallcloudai/refact-lsp/archive/refs/tags/v0.8.2.zip",
+    arm64_Windows = "https://github.com/smallcloudai/refact-lsp/archive/refs/tags/v0.8.2.zip",
+    x86_64_Darwin = "https://github.com/smallcloudai/refact-lsp/archive/refs/tags/v0.8.2.zip",
+    arm64_Darwin = "https://github.com/smallcloudai/refact-lsp/archive/refs/tags/v0.8.2.zip",
   }
 
   return dist_map[arch .. "_" .. os]
