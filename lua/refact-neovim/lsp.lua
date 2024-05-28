@@ -33,7 +33,7 @@ local function download_and_unzip(url, path)
   fn.system("curl -L -o " .. path .. ".zip " .. url)
   fn.system("unzip " .. path .. ".zip -d " .. path .. "-src")
   fn.system("rm " .. path .. ".zip")
-  fn.system("cargo build --release --manifest-path=" .. path .. "-src/refact-lsp-0.8.0/Cargo.toml")
+  fn.system("cargo build --release --manifest-path=" .. path .. "-src/refact-lsp-0.8.2/Cargo.toml")
   fn.system("mv " .. path .. "-src/refact-lsp-0.8.0/target/release/refact-lsp " .. path)
   fn.system("rm -r " .. path .. "-src")
 end
@@ -117,6 +117,38 @@ function M.get_completions(callback)
   end
 end
 
+local function create_command(path)
+  local cmd = {
+    path,
+    "--address-url", config.get().address_url,
+    "--api-key", config.get().api_key,
+    "--lsp-stdin-stdout", "1"
+  }
+
+  if config.get().insecure_ssl then
+    table.insert(cmd, "--insecure")
+  end
+
+  if config.get().telemetry_code_snippets then
+    table.insert(cmd, "--snippet-telemetry")
+  end
+
+  if config.get().vecdb then
+    table.insert(cmd, "--vecdb")
+  end
+
+  if config.get().ast then
+    table.insert(cmd, "--ast")
+    local file_limit = config.get().ast_file_limit
+    if file_limit ~= 15000 then
+      table.insert(cmd, "--ast-index-max-files")
+      table.insert(cmd, tostring(file_limit))
+    end
+  end
+
+  return cmd
+end
+
 function M.setup()
   if M.setup_done then
     return
@@ -134,12 +166,7 @@ function M.setup()
     return
   end
 
-  local cmd = {
-    path,
-    "--address-url", config.get().address_url,
-    "--api-key", config.get().api_key,
-    "--lsp-stdin-stdout", "1"
-  }
+  local cmd = create_command(path)
 
   local client_id = lsp.start({
     name = "refact",
@@ -148,7 +175,7 @@ function M.setup()
   })
 
   if client_id == nil then
-    vim.notify("[REFACT] Error starting refact-lsp", vim.log.levels.ERROR)
+    vim.notify("[REFACT] Error starting refact-lsp ", vim.log.levels.ERROR)
     return
   end
 
