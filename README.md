@@ -18,3 +18,17 @@ use {
   end
 }
 ```
+
+### Lualine
+
+Refact-neovim is compatible with [lualine](https://github.com/nvim-lualine/lualine.nvim).
+Example configuration:
+
+```lua
+require('lualine').setup({
+  sections = {
+    lualine_x = {
+      require("refact-neovim").status_line,
+    },
+  },
+})
