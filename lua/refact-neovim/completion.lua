@@ -7,6 +7,7 @@ local fn = vim.fn
 local M = {
   suggestion = nil,
   timer = nil,
+  processing = false,
   ns_id = api.nvim_create_namespace("refact.suggestion"),
 }
 
@@ -24,7 +25,13 @@ end
 
 local function show_suggestion()
   clear_preview()
+  M.processing = true
   refact_lsp.get_completions(function(err, result)
+    if not M.processing then
+      return
+    end
+
+    M.processing = false
     if err ~= nil then
       vim.notify("[REFACT] " .. err.message, vim.log.levels.ERROR)
       return
@@ -48,11 +55,13 @@ local function show_suggestion()
     end
 
     M.suggestion = lines
+    clear_preview()
     api.nvim_buf_set_extmark(0, M.ns_id, line - 1, col, extmark)
   end)
 end
 
 function M.cancel()
+  M.processing = false
   clear_preview()
   stop_timer()
 end
