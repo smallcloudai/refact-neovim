@@ -10,6 +10,7 @@ local M = {
   timer = nil,
   processing = false,
   ns_id = api.nvim_create_namespace("refact.suggestion"),
+  completion_id = 0,
 }
 
 local function stop_timer()
@@ -33,8 +34,16 @@ local function show_suggestion()
   clear_preview()
   M.processing = true
   refresh_lualine()
+  M.completion_id = M.completion_id + 1
+
+  local current_id = M.completion_id
+
   refact_lsp.get_completions(function(err, result)
     if not M.processing then
+      return
+    end
+
+    if current_id ~= M.completion_id then
       return
     end
 
