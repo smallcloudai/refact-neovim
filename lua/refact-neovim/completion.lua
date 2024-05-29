@@ -11,6 +11,7 @@ local M = {
   processing = false,
   ns_id = api.nvim_create_namespace("refact.suggestion"),
   completion_id = 0,
+  paused = false,
 }
 
 local function stop_timer()
@@ -87,7 +88,7 @@ end
 function M.schedule()
   M.cancel()
 
-  if not refact_lsp.should_do_suggestion() then
+  if not refact_lsp.should_do_suggestion() or M.paused then
     return
   end
 
@@ -96,6 +97,19 @@ function M.schedule()
       show_suggestion()
     end
   end)
+end
+
+function M.toggle_pause()
+  if M.paused then
+    M.paused = false
+    if fn.mode() == "i" then
+      M.schedule()
+    end
+  else
+    M.paused = true
+    M.cancel()
+  end
+  refresh_lualine()
 end
 
 local function complete()

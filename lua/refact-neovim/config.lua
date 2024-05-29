@@ -14,6 +14,10 @@ local default_config = {
   -- Keymap for completion.
   accept_keymap = "<Tab>",
 
+  -- Keymap for pausing autocompletion.
+  --- @type string | nil
+  pause_keymap = nil,
+
   -- How many milliseconds to wait before triggering a new request.
   debounce_ms = 200,
 
