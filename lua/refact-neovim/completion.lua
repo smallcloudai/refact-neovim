@@ -92,6 +92,10 @@ function M.schedule()
     return
   end
 
+  if vim.api.nvim_buf_get_name(0) == "" then
+    return
+  end
+
   M.timer = fn.timer_start(config.get().debounce_ms, function()
     if fn.mode() == "i" then
       show_suggestion()
