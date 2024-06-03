@@ -15,7 +15,6 @@ use {
     require("refact-neovim").setup({
       address_url = "Refact",
       api_key = <API_KEY>,
-      lsp_bin = <PATH_TO_LSP_BIN>,
     })
   end
 }
@@ -30,7 +29,6 @@ use {
     require("refact-neovim").setup({
       address_url = "Refact",
       api_key = <API_KEY>,
-      lsp_bin = <PATH_TO_LSP_BIN>,
     })
   end
 }
