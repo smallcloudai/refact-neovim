@@ -7,7 +7,6 @@ Refact for Neovim is a free, open-source AI code assistant.
 ### [lazy.nvim](https://github.com/folke/lazy.nvim)
 
 ```lua
-use {
 {
   "smallcloudai/refact-neovim",
   lazy = false,
