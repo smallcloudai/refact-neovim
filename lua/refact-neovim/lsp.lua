@@ -14,28 +14,33 @@ local function get_bin_url()
   local arch = os_uname.machine
   local os = os_uname.sysname
 
-  -- todo: put urls to download binary, instead of source code
   local dist_map = {
-    x86_64_Linux = "https://github.com/smallcloudai/refact-lsp/archive/refs/tags/v0.8.2.zip",
-    armv7l_Linux = "https://github.com/smallcloudai/refact-lsp/archive/refs/tags/v0.8.2.zip",
-    arm64_Linux = "https://github.com/smallcloudai/refact-lsp/archive/refs/tags/v0.8.2.zip",
-    x86_64_Windows = "https://github.com/smallcloudai/refact-lsp/archive/refs/tags/v0.8.2.zip",
-    i686_Windows = "https://github.com/smallcloudai/refact-lsp/archive/refs/tags/v0.8.2.zip",
-    arm64_Windows = "https://github.com/smallcloudai/refact-lsp/archive/refs/tags/v0.8.2.zip",
-    x86_64_Darwin = "https://github.com/smallcloudai/refact-lsp/archive/refs/tags/v0.8.2.zip",
-    arm64_Darwin = "https://github.com/smallcloudai/refact-lsp/archive/refs/tags/v0.8.2.zip",
+    x86_64_Linux =
+    "https://github.com/smallcloudai/refact-lsp/releases/download/v0.8.3/dist-x86_64-unknown-linux-gnu.zip",
+    armv7l_Linux =
+    "https://github.com/smallcloudai/refact-lsp/releases/download/v0.8.3/dist-arm-unknown-linux-gnueabihf.zip",
+    arm64_Linux =
+    "https://github.com/smallcloudai/refact-lsp/releases/download/v0.8.3/dist-aarch64-unknown-linux-gnu.zip",
+    x86_64_Windows =
+    "https://github.com/smallcloudai/refact-lsp/releases/download/v0.8.3/dist-x86_64-pc-windows-msvc.zip",
+    i686_Windows = "https://github.com/smallcloudai/refact-lsp/releases/download/v0.8.3/dist-i686-pc-windows-msvc.zip",
+    arm64_Windows =
+    "https://github.com/smallcloudai/refact-lsp/releases/download/v0.8.3/dist-aarch64-pc-windows-msvc.zip",
+    x86_64_Darwin = "https://github.com/smallcloudai/refact-lsp/releases/download/v0.8.3/dist-x86_64-apple-darwin.zip",
+    arm64_Darwin = "https://github.com/smallcloudai/refact-lsp/releases/download/v0.8.3/dist-aarch64-apple-darwin.zip",
   }
 
   return dist_map[arch .. "_" .. os]
 end
 
 local function download_and_unzip(url, path)
+  vim.notify("[REFACT] downloading refact-lsp...", vim.log.levels.INFO)
   fn.system("curl -L -o " .. path .. ".zip " .. url)
-  fn.system("unzip " .. path .. ".zip -d " .. path .. "-src")
+  fn.system("unzip " .. path .. ".zip -d " .. path .. "-dir")
   fn.system("rm " .. path .. ".zip")
-  fn.system("cargo build --release --manifest-path=" .. path .. "-src/refact-lsp-0.8.2/Cargo.toml")
-  fn.system("mv " .. path .. "-src/refact-lsp-0.8.0/target/release/refact-lsp " .. path)
-  fn.system("rm -r " .. path .. "-src")
+  fn.system("mv " .. path .. "-dir/refact-lsp " .. path)
+  fn.system("chmod +x " .. path)
+  fn.system("rm -r " .. path .. "-dir")
 end
 
 local function download_lsp()
