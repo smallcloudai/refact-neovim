@@ -58,7 +58,7 @@ local function show_suggestion()
     local generated_text = refact_lsp.extract_generation(result.choices)
     local lines = util.split_str(generated_text, "\n")
 
-    local line, col = util.get_cursor_pos()
+    local line, col = util.get_screen_pos()
     local extmark = {
       virt_text = { { lines[1], "Comment" } }
     }

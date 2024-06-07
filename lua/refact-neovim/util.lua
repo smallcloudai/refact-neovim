@@ -21,6 +21,11 @@ function M.get_cursor_pos()
   return unpack(api.nvim_win_get_cursor(0))
 end
 
+function M.get_screen_pos()
+  local line = api.nvim_win_get_cursor(0)[1]
+  return line, vim.fn.virtcol('.') - 1
+end
+
 function M.get_current_line()
   local line, _ = M.get_cursor_pos()
   return api.nvim_buf_get_lines(0, line - 1, line, true)[1]
