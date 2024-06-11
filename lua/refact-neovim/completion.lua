@@ -22,7 +22,11 @@ local function stop_timer()
 end
 
 local function clear_preview()
-  api.nvim_buf_clear_namespace(0, M.ns_id, 0, -1)
+  if M.suggestion ~= nil then
+    vim.keymap.del("i", config.get().accept_keymap)
+    M.suggestion = nil
+    api.nvim_buf_clear_namespace(0, M.ns_id, 0, -1)
+  end
 end
 
 local function refresh_lualine()
@@ -56,6 +60,9 @@ local function show_suggestion()
     end
 
     local generated_text = refact_lsp.extract_generation(result.choices)
+    if generated_text == "" then
+      return
+    end
     local lines = util.split_str(generated_text, "\n")
 
     local line, col = util.get_screen_pos()
@@ -72,9 +79,11 @@ local function show_suggestion()
       extmark.virt_text_win_col = col
     end
 
-    M.suggestion = lines
     clear_preview()
+
+    M.suggestion = lines
     api.nvim_buf_set_extmark(0, M.ns_id, line - 1, col, extmark)
+    vim.keymap.set("i", config.get().accept_keymap, M.accept_suggestion, { expr = true })
   end)
 end
 
@@ -135,11 +144,11 @@ local function complete()
     api.nvim_buf_set_lines(0, line - 1, line, false, { current_line .. M.suggestion[1] })
     api.nvim_win_set_cursor(0, { line, col + string.len(M.suggestion[1]) })
   end
-  M.suggestion = nil
+
+  clear_preview()
 end
 
 function M.accept_suggestion()
-  clear_preview()
   vim.schedule(complete)
 end
 

@@ -23,8 +23,6 @@ local function setup(user_config)
       callback = completion.schedule
     })
 
-    vim.keymap.set("i", config.get().accept_keymap, completion.accept_suggestion, { expr = true })
-
     local pause_keymap = config.get().pause_keymap
     if pause_keymap ~= nil then
       vim.keymap.set("i", pause_keymap, completion.toggle_pause, { expr = true })
